@@ -21,9 +21,9 @@ import Sigin from './pages/Sigin';
 import ShiftHistory from './pages/ShiftHistory';
 import CustomTabBar from './components/CustomTabBar';
 import React, { useEffect, useState } from 'react';
-import { supabase } from './supabase/supabase';
 import { ForegroundService } from '@capawesome-team/capacitor-android-foreground-service';
 import { Capacitor } from '@capacitor/core';
+import { logoutApi } from './http/api';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -67,9 +67,11 @@ const App: React.FC = () => {
 
   const logout = async () => {
     try {
-      await supabase.auth.signOut();
+      const sessionRaw = localStorage.getItem('session');
+      const session = sessionRaw ? JSON.parse(sessionRaw) : null;
+      await logoutApi(session?.refresh_token);
     } catch (err) {
-      console.warn('Supabase signOut error', err);
+      console.warn('Logout API error', err);
     } finally {
       localStorage.removeItem('isAuthenticated');
       localStorage.removeItem('username');

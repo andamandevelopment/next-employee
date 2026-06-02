@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace = "at.next.employee"
+    namespace = "at.nova.employee"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "at.next.employee"
+        applicationId "at.nova.employee"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -21,6 +21,21 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+        }
+    }
+    buildFeatures {
+        dataBinding true
+    }
+    dataBinding {
+        enabled = true
     }
 }
 

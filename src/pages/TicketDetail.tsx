@@ -7,9 +7,8 @@ import { usePhoneCallFlow } from '../hooks/usePhoneCallFlow';
 import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { BouceAnimation } from '../components/Animations';
-import { supabase } from '../supabase/supabase';
 import { Ticket } from '../types/Ticket';
-import { checkInSelf, getDriverTripPassengers } from '../https/api';
+import { checkInSelf, getDriverTripPassengers, getTripDetail, saveCallCustomer } from '../https/api';
 import QRCode from "qrcode";
 import './TicketDetail.css';
 
@@ -36,25 +35,20 @@ const TicketDetail: React.FC = () => {
     const session = JSON.parse(sessionstr || "{}")
 
     try {
-      const { error: callCustomerError } = await supabase.from("call_customer").insert({
+      const saved = await saveCallCustomer({
         booking_id: metadata?.booking_id,
         call_time: moment().format(),
-        user_id: session?.user?.id,
+        user_id: session?.user?.id || session?.driver?.id,
         result: result,
         phone_number: currentPhone,
         ticket_number: metadata?.ticket_number
       });
-
-      if (callCustomerError) {
-        console.error("Error saving call log:", callCustomerError);
-      } else {
-        iontoast({
-          message: "บันทึกการโทรสำเร็จ",
-          duration: 2000,
-          color: "success",
-          position: "top"
-        });
-      }
+      iontoast({
+        message: saved?.skipped ? "ยังไม่มี API สำหรับบันทึกการโทร" : "บันทึกการโทรสำเร็จ",
+        duration: 2000,
+        color: saved?.skipped ? "warning" : "success",
+        position: "top"
+      });
     } catch (err) {
       console.error("Unexpected error in handlerCall:", err);
     }
@@ -157,10 +151,10 @@ const TicketDetail: React.FC = () => {
         console.log("Decoded QR Detail:", qrDetail);
 
         const passengers: any = await getDriverTripPassengers(qrDetail.trip)
-        const { data: tripData, error: tripError } = await supabase.from('trips').select('*, route_id(*)').eq('id', qrDetail.trip).single()
+        const tripData = await getTripDetail(qrDetail.trip)
 
         console.log("passengers. ", passengers)
-        if (passengers?.error || tripError) {
+        if (passengers?.error || !tripData) {
           ionalert({
             header: 'ไม่พบข้อมูลตั๋ว',
             message: passengers?.error,
@@ -175,7 +169,7 @@ const TicketDetail: React.FC = () => {
               }
             ]
           });
-          throw tripError;
+          throw new Error(passengers?.error || 'Trip not found');
         }
 
         const bookingPassengers = passengers.filter((e: any) => e.bookingReference === qrDetail.bookingReference);

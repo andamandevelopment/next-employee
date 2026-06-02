@@ -30,7 +30,7 @@
 .signin-card {
   width: 90%;
   max-width: 400px;
-  background: var(--glass-bg);
+  background:  #FFF;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
@@ -90,6 +90,7 @@
 
 .modern-input-item {
   --background: var(--input-bg);
+  --color: #1e293b;
   --border-radius: 14px;
   --padding-start: 1rem;
   --highlight-height: 0;

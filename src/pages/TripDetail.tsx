@@ -2,15 +2,13 @@ import { faArrowDown, faArrowLeft, faArrowRight, faArrowUp, faCarSide, faLocatio
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButton, IonGrid, IonRow, IonCol, IonText, IonBackButton, IonLabel, IonIcon, IonChip, IonAccordion, IonAccordionGroup, IonBadge, IonModal, IonItem, IonInput, IonList, IonLoading, IonToast, IonTextarea, IonRefresher, IonRefresherContent } from '@ionic/react';
 import { speedometerOutline, batteryChargingOutline, documentTextOutline, qrCodeOutline, giftOutline } from 'ionicons/icons';
-import moment, { duration } from 'moment';
+import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import './css/TripDetail.css';
 import { BouceAnimation } from '../components/Animations';
-import { supabase } from '../supabase/supabase';
 
-import { Trip } from '../types/trip';
-import { getTripSeats, updateDriverLocation, startShift, stopShift, getDriverTripPassengers } from '../https/api';
+import { updateDriverLocation, startShift, stopShift, getDriverTripPassengers, getTripDetail, getBusStops } from '../https/api';
 
 import { Geolocation } from '@capacitor/geolocation';
 import { ForegroundService, ServiceType } from '@capawesome-team/capacitor-android-foreground-service';
@@ -175,29 +173,23 @@ const TripDetail: React.FC = () => {
   };
 
   const getTrip = async () => {
+    const [passengers, tripData]: [any[], any] = await Promise.all([
+      getDriverTripPassengers(id),
+      getTripDetail(id)
+    ]);
+    console.log("passengers ", passengers);
+    console.log("trip data ", tripData);
 
-    const passengers: any[] = await getDriverTripPassengers(id)
-    console.log("passengers ", passengers)
+    if (!tripData?.id) return;
 
-    const { data, error } = await supabase.from('trips')
-      .select('*, route_id(*)')
-      .eq('id', id)
-      .single();
-    console.log("trips data ", data);
-    if (error) {
-      console.log(error);
-    }
-    if (data) {
-      console.log("trips data ", data);
+    const busStops = await getBusStops(tripData.route_id?.id || tripData.routeId, {
+      originProvinceId: tripData.origin_province_id,
+      destinationProvinceId: tripData.destination_province_id,
+      origin: tripData.route_id?.origin,
+      destination: tripData.route_id?.destination,
+    });
 
-      const { data: busStops, error: busStopsError } = await supabase.from('bus_stops')
-        .select('*')
-        .eq('route_id', data.route_id.id)
-      if (busStopsError) {
-        throw busStopsError
-      }
-      console.log("busStops ", busStops);
-
+    if (Array.isArray(busStops)) {
       for (const bsp of busStops) {
         const onBoardTickets = passengers.filter((p: any) => p.pickupStop === bsp.name);
         const offBoardTickets = passengers.filter((p: any) => p.dropoffStop === bsp.name);
@@ -205,19 +197,12 @@ const TripDetail: React.FC = () => {
         bsp.passengerOnboard = onBoardTickets.length;
         bsp.passengerOffboard = offBoardTickets.length;
       }
-      data.bus_stops = busStops
-
-      const { data: bustype, error: bustypeError } = await supabase.from('bus_types')
-        .select('*')
-        .eq('id', data.bus_type_id)
-        .single()
-      if (bustypeError) {
-        throw bustypeError
-      }
-      data.bus_type = bustype
-      console.log("data ", data);
-      setTrip(data as any);
+      tripData.bus_stops = busStops;
+    } else {
+      tripData.bus_stops = [];
     }
+
+    setTrip(tripData as any);
   }
 
   useEffect(() => {
@@ -325,7 +310,7 @@ const TripDetail: React.FC = () => {
               </div>
               <div className="flex flex-col ">
                 <IonText className='text-xs' color={"medium"} ><strong> ทะเบียนรถ :</strong> {trip?.bus_number} {trip?.bus_type?.name}</IonText>
-                <IonText className='text-xs' color={"medium"} ><strong>สิ่งอำนวยความสะดวก :</strong> {trip?.bus_type?.amenities.join(", ")}</IonText>
+                <IonText className='text-xs' color={"medium"} ><strong>สิ่งอำนวยความสะดวก :</strong> {(trip?.bus_type?.amenities || []).join(", ") || "-"}</IonText>
               </div>
             </BouceAnimation>
 

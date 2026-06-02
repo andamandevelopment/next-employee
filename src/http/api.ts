@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const API = "https://nex-api.rubyclaw.tech/api";
+export const API = "https://nova-api.rubyclaw.tech/api";
 
 export const apiClient = axios.create({
 	baseURL: API,
@@ -131,6 +131,10 @@ export const updateDriverMe = async (
 	return response.data;
 };
 
+export const logoutApi = async (refreshToken?: string): Promise<void> => {
+	await apiClient.post("/auth/logout", refreshToken ? { refresh_token: refreshToken } : {});
+};
+
 export interface ShiftStartPayload {
 	trip_id: string;
 	vehicle_id: string;
@@ -145,4 +149,3 @@ export interface ShiftStopPayload {
 	stop_battery: number;
 	notes: string;
 }
-

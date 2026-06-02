@@ -7,10 +7,10 @@ http://ionicframework.com/docs/theming/ */
 
 :root {
     --ion-font-family: 'Inter', 'Kanit', system-ui, -apple-system, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
-    --ion-color-primary: #E3203B;
-    --ion-color-primary-rgb: 227, 32, 58;
-    --ion-color-primary-tint: #e94f5c;
-    --ion-color-primary-shade: #c11b32;
+    --ion-color-primary: #9E0A15;
+    --ion-color-primary-rgb: 158, 10, 21;
+    --ion-color-primary-tint: #b32a3a;
+    --ion-color-primary-shade: #7a0810;
     --ion-border-radius: 8px;
 
     --ion-color-warning: #F9E000;

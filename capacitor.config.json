@@ -1,6 +1,6 @@
 {
-  "appId": "at.next.employee",
-  "appName": "NextEmployee",
+  "appId": "at.nova.employee",
+  "appName": "Nova Employee",
   "versionCode": 3,
   "versionName": "0.0.3",
   "bundledWebRuntime": false,

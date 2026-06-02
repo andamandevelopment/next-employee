@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback, useEffect } from "react";
-import { checkInSelf, getTripSeats, getDriverTripPassengers } from "../https/api";
+import { checkInSelf, getTripSeats, getDriverTripPassengers, getTripDetail, getCallCustomerHistory, saveCallCustomer } from "../https/api";
 import { useParams, useHistory } from "react-router-dom";
 import {
     IonPage,
@@ -21,7 +21,6 @@ import {
     IonActionSheet,
 } from "@ionic/react";
 import { CircleDot, DoorOpen, Toilet, TriangleAlert, MoveDown, User, Armchair, X } from "lucide-react";
-import { supabase } from "../supabase/supabase";
 import { Trip, TripDetail } from "../types/trip";
 import moment from "moment";
 import "./css/PlanChair.css";
@@ -181,13 +180,7 @@ const PlanChair: React.FC = () => {
             console.log("passengers ", passengers);
 
             // Fetch Trip
-            const { data: tripData, error: tripError } = await supabase
-                .from("trips")
-                .select("*, route_id(*), bus_type:bus_type_id(*)")
-                .eq("id", id)
-                .single();
-
-            if (tripError && tripError.code !== 'PGRST116') console.error("Error fetching trip:", tripError);
+            const tripData = await getTripDetail(id);
             if (tripData) setTrip(tripData as any);
 
             // Fetch Layout and Seats from Nex API
@@ -243,10 +236,11 @@ const PlanChair: React.FC = () => {
     const toggleSeat = useCallback(async (seat: Seat) => {
         if (seat.status === "booked" || seat.status === "unavailable") {
             try {
-                const { data: callHistory } = await supabase.from("call_customer").select("*")
-                    .eq("booking_id", seat?.ticket_id?.booking_id)
-                    .eq("phone_number", seat.ticket_id?.passenger_phone)
-                    .eq("ticket_number", seat?.ticket_id?.ticket_number);
+                const callHistory = await getCallCustomerHistory({
+                    booking_id: seat?.ticket_id?.booking_id,
+                    phone_number: seat.ticket_id?.passenger_phone,
+                    ticket_number: seat?.ticket_id?.ticket_number
+                });
 
                 const seatupdate: any = { ...seat, call_record: callHistory || [] };
                 setSelectedSeatData(seatupdate);
@@ -277,16 +271,20 @@ const PlanChair: React.FC = () => {
         const sessionstr = localStorage.getItem("session");
         const session = JSON.parse(sessionstr || "{}");
         try {
-            const { error } = await supabase.from("call_customer").insert({
+            const saved = await saveCallCustomer({
                 booking_id: metadata?.ticket_id?.booking_id,
                 call_time: moment().format(),
-                user_id: session?.user?.id,
+                user_id: session?.user?.id || session?.driver?.id,
                 result: result,
                 phone_number: currentPhone,
                 ticket_number: metadata?.ticket_id?.ticket_number
             });
-            if (error) throw error;
-            iontoast({ message: "บันทึกการโทรสำเร็จ", duration: 2000, color: "success", position: "top" });
+            iontoast({
+                message: saved?.skipped ? "ยังไม่มี API สำหรับบันทึกการโทร" : "บันทึกการโทรสำเร็จ",
+                duration: 2000,
+                color: saved?.skipped ? "warning" : "success",
+                position: "top"
+            });
         } catch (err) {
             console.error("Error saving call log:", err);
         }
@@ -304,13 +302,6 @@ const PlanChair: React.FC = () => {
                 iontoast({ message: "เช็คอินไม่สำเร็จ", duration: 2000, color: "danger", position: "top" });
                 return;
             }
-            // const { error } = await supabase
-            //     .from('tickets')
-            //     .update({ checked_in_at: checkedAt })
-            //     .eq('id', selectedSeatData.ticket_id.id);
-
-            // if (error) throw error;
-
             setSelectedSeatData((prev: any) => ({
                 ...prev,
                 ticket_id: { ...prev.ticket_id, checked_in_at: checkedAt }

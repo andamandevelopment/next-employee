@@ -8,7 +8,6 @@ import { useHistory } from 'react-router-dom';
 import './css/Home.css';
 import moment from 'moment';
 import { BouceAnimation } from '../components/Animations';
-import { supabase } from '../supabase/supabase';
 moment.locale('th'); // set Thai locale for date formatting
 
 import { Trip } from '../types/trip';
