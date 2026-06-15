@@ -21,6 +21,7 @@ const Trips: React.FC = () => {
   const [segment, setSegment] = useState<'active' | 'ended'>('active');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState(moment());
+  const [driverMe, setDriverMe] = useState<any>(null);
 
   const getdriverTrips = async (date: moment.Moment) => {
     setIsLoading(true);
@@ -44,6 +45,14 @@ const Trips: React.FC = () => {
   };
 
   useEffect(() => {
+    const getDriver=()=>{ 
+      const driverMe = localStorage.getItem('driver_me'); 
+      if (driverMe) {  
+        const meData = JSON.parse(driverMe);
+        setDriverMe(meData);
+      }
+    }
+    getDriver()
     getdriverTrips(selectedDate);
   }, [selectedDate]);
 
@@ -58,7 +67,7 @@ const Trips: React.FC = () => {
               <h2 className="text-xl font-bold" style={{ color: '#FFF' }}>เที่ยวรถทั้งหมด</h2>
             </IonText>
             <IonText color="light">
-              <div className="text-sm" style={{ color: '#FFF' }}>จัดการเที่ยวการเดินทางของคุณ</div>
+              <div className="text-sm" style={{ color: '#FFF' }}>จัดการเที่ยวการเดินทางของคุณ {driverMe?.user?.full_name }</div>
             </IonText>
           </div>
         </IonToolbar>
@@ -80,7 +89,7 @@ const Trips: React.FC = () => {
                   className={`flex flex-col items-center justify-center min-w-[60px] h-[80px] rounded-2xl transition-all duration-200 cursor-pointer ${isSelected ? 'bg-primary text-white shadow-lg scale-105' : 'bg-white text-gray-400'}`}
                 >
                   <span className="text-[10px] font-medium uppercase mb-1">
-                    {date.format('ddd')}
+                    {date.locale('th').format('ddd')}
                   </span>
                   <span className={`text-xl font-bold ${isSelected ? 'text-white' : 'text-gray-800'}`}>
                     {date.format('D')}

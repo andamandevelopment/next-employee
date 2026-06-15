@@ -5,10 +5,8 @@ import { faBus, faCarSide, faClipboardList, faQrcode, faUser, faArrowsRotate, fa
 import { faClock } from '@fortawesome/free-regular-svg-icons'
 import { useHistory } from 'react-router-dom';
 
-import './css/Home.css';
-import moment from 'moment';
+import './css/Home.css'; 
 import { BouceAnimation } from '../components/Animations';
-moment.locale('th'); // set Thai locale for date formatting
 
 import { Trip } from '../types/trip';
 import { getDriverTrips, getDriverMe, DriverMeResponse } from '../http/api';
@@ -16,7 +14,13 @@ import { getDriverRounds } from '../https/api';
 import CardTrip from '../components/CardTrip';
 import CardTripSkeleton from '../components/CardTripSkeleton';
 import ActiveShiftSkeleton from '../components/ActiveShiftSkeleton';
-import StatsSkeleton from '../components/StatsSkeleton';
+import StatsSkeleton from '../components/StatsSkeleton'; 
+import moment from 'moment-timezone';
+
+// Set default timezone to Bangkok (Asia/Bangkok)
+moment.tz.setDefault('Asia/Bangkok');
+moment.locale('th');
+
 
 const Home: React.FC = () => {
   const history = useHistory();
@@ -60,6 +64,8 @@ const Home: React.FC = () => {
       console.log("roundsData ", roundsData);
       setTrips(tripsData as any[]);
       setDriverMe(meData);
+      console.log("meData ", meData);
+      localStorage.setItem('driver_me', JSON.stringify(meData));
 
       // Sync active_shift_id with real-time status from API
       if (meData?.current_shift) {
@@ -89,8 +95,8 @@ const Home: React.FC = () => {
     fetchData(selectedDate);
   }, [selectedDate]);
 
-  const dates = Array.from({ length: 14 }, (_, i) => moment().subtract(3, 'days').add(i, 'days'));
-
+  const timecounter= moment().locale('th').lang('th').format('LLL')
+ 
   return (
     <IonPage>
       <IonHeader className="ion-no-border header-sticky">
@@ -103,13 +109,13 @@ const Home: React.FC = () => {
                     {isLoading ? (
                       <IonSkeletonText animated style={{ width: '150px', height: '28px', background: 'rgba(255,255,255,0.2)' }} />
                     ) : (
-                      `สวัสดี, ${driverMe?.user.full_name.split(' ')[0] || 'กัปตัน'}`
+                      ` ${driverMe?.user.full_name }`
                     )}
                   </h2>
                 </IonText>
                 <IonText color="light">
                   <p className="text-sm opacity-80 ion-no-margin subtitle-text text-white">
-                    {moment().format('dddd, D MMMM YYYY')}
+                    {timecounter}
                   </p>
                 </IonText>
               </div>

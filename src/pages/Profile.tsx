@@ -41,6 +41,7 @@ import {
   alertCircleOutline,
   chevronForwardOutline,
   headsetOutline,
+  shieldCheckmarkOutline, 
 } from 'ionicons/icons';
 import { getDriverMe, DriverMeResponse, updateDriverMe } from '../http/api';
 import './css/Profile.css';
@@ -227,6 +228,10 @@ const Profile: React.FC = () => {
                 <div className="value">{data.driver.name}</div>
               </div>
               <div className="info-row">
+                <div className="label">เลขประจำตัวประชาชน</div>
+                <div className="value">{data.user.national_id || '-'}</div>
+              </div>
+              <div className="info-row">
                 <div className="label">ใบขับขี่</div>
                 <div className="value">{data.driver.license_number}</div>
               </div>
@@ -336,6 +341,16 @@ const Profile: React.FC = () => {
                 <div className="menu-item-content">
                   <div className="menu-item-label">ติดต่อ Admin Support</div>
                   <div className="menu-item-sub">080-000-0000 · แจ้งปัญหาการใช้งาน</div>
+                </div>
+                <IonIcon icon={chevronForwardOutline} className="menu-item-arrow" />
+              </a>
+              <a href="tel:0801234567" className="menu-item insurance-item">
+                <div className="menu-item-icon insurance">
+                  <IonIcon icon={shieldCheckmarkOutline} />
+                </div>
+                <div className="menu-item-content">
+                  <div className="menu-item-label">ติดต่อ Insurance</div>
+                  <div className="menu-item-sub">080-123-4567 · ข้อมูลประกันภัย</div>
                 </div>
                 <IonIcon icon={chevronForwardOutline} className="menu-item-arrow" />
               </a>

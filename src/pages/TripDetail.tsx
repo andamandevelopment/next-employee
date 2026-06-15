@@ -11,6 +11,7 @@ import { BouceAnimation } from '../components/Animations';
 import { updateDriverLocation, startShift, stopShift, getDriverTripPassengers, getTripDetail, getBusStops } from '../https/api';
 
 import { Geolocation } from '@capacitor/geolocation';
+import { Device } from '@capacitor/device';
 import { ForegroundService, ServiceType } from '@capawesome-team/capacitor-android-foreground-service';
 import { Capacitor } from '@capacitor/core';
 import TripDetailSkeleton from '../components/TripDetailSkeleton';
@@ -41,7 +42,7 @@ const TripDetail: React.FC = () => {
   const [showToast, setShowToast] = useState(false);
 
   const [startFormData, setStartFormData] = useState({
-    start_km: 0,
+    start_km: 1,
     start_mileage: 0,
     start_battery: 100
   });
@@ -212,6 +213,14 @@ const TripDetail: React.FC = () => {
     return <TripDetailSkeleton />;
   }
 
+  const endTask=async ()=>{ 
+    const battery: any = await Device.getBatteryInfo();
+    if(battery){
+     setStopFormData({ ...stopFormData, stop_battery: battery?.batteryLevel * 100 })
+    }
+    setShowStopModal(true)
+  }
+
   const isToday = moment(trip.date).isSame(moment(), 'day');
 
   return (
@@ -337,7 +346,7 @@ const TripDetail: React.FC = () => {
                 <IonButton expand='block' mode='ios' color="success" className="rounded-xl" onClick={() => setShowStartModal(true)} disabled={!isToday}>
                   เริ่มเที่ยว
                 </IonButton>
-                <IonButton expand='block' mode='ios' color="danger" className="rounded-xl" onClick={() => setShowStopModal(true)} disabled={!isToday}>
+                <IonButton expand='block' mode='ios' color="danger" className="rounded-xl" onClick={() => endTask()} disabled={!isToday}>
                   จบเที่ยว
                 </IonButton><br />
                 <IonButton expand='block' fill='outline' mode='ios' color="danger" className="rounded-xl"
@@ -377,7 +386,7 @@ const TripDetail: React.FC = () => {
                     className="modern-input"
                   />
                 </IonItem>
-                <IonItem className="modern-input-item">
+                {/* <IonItem className="modern-input-item">
                   <IonIcon icon={speedometerOutline} slot="start" className="input-icon" />
                   <IonInput
                     type="number" labelPlacement="stacked" label='เลขระยะทางเริ่มต้น'
@@ -386,7 +395,7 @@ const TripDetail: React.FC = () => {
                     placeholder="เลขระยะทางเริ่มต้น (Start Mileage)"
                     className="modern-input"
                   />
-                </IonItem>
+                </IonItem> */}
                 <IonItem className="modern-input-item">
                   <IonIcon icon={batteryChargingOutline} slot="start" className="input-icon" />
                   <IonInput
@@ -423,7 +432,10 @@ const TripDetail: React.FC = () => {
                   <IonInput
                     type="number" label="เลขไมล์สิ้นสุด (Stop KM)" labelPlacement="stacked"
                     value={stopFormData.stop_km}
-                    onIonInput={(e) => setStopFormData({ ...stopFormData, stop_km: Number(e.detail.value) })}
+                    onIonInput={(e) =>{ 
+                      setStopFormData({ ...stopFormData, stop_km: Number(e.detail.value) });
+                      startFormData.start_km && setStopFormData(prev => ({ ...prev, stop_mileage: Number(e.detail.value) - startFormData.start_km }))
+                    }}
                     placeholder="เลขไมล์สิ้นสุด (Stop KM)"
                     className="modern-input"
                   />
@@ -441,7 +453,7 @@ const TripDetail: React.FC = () => {
                 <IonItem className="modern-input-item">
                   <IonIcon icon={batteryChargingOutline} slot="start" className="input-icon" />
                   <IonInput
-                    type="number" label="ระดับแบตเตอรี่สิ้นสุด (%)" labelPlacement="stacked"
+                    type="number" label="แบตเตอรี่โทรศัพท์เมื่อสิ้นสุด (%)" labelPlacement="stacked"
                     value={stopFormData.stop_battery}
                     onIonInput={(e) => setStopFormData({ ...stopFormData, stop_battery: Number(e.detail.value) })}
                     placeholder="ระดับแบตเตอรี่สิ้นสุด (%)"

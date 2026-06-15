@@ -95,6 +95,7 @@ export interface DriverMeResponse {
 		id: string;
 		username: string;
 		email: string | null;
+		national_id: string | null;
 		full_name: string;
 		phone: string;
 		avatar_url: string | null;

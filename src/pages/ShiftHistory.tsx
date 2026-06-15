@@ -3,13 +3,14 @@ import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock, faGasPump, faBatteryThreeQuarters, faCircleInfo, faChevronRight, faWallet, faClipboardList, faCoins } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
-import 'moment/locale/th';
 import { getDriverRounds } from '../https/api';
 import { BouceAnimation } from '../components/Animations';
 import ActivityItemSkeleton from '../components/ActivityItemSkeleton';
 import StatsSkeleton from '../components/StatsSkeleton';
 import './css/Home.css';
 import './css/ShiftHistory.css';
+// set locale without side-effect import to avoid missing type declarations for the locale module
+moment.locale('th'); 
 
 const ShiftHistory: React.FC = () => {
   const [rounds, setRounds] = useState<any[]>([]);
@@ -38,6 +39,7 @@ const ShiftHistory: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
+    
   };
 
   const doRefresh = async (event: CustomEvent) => {
@@ -117,7 +119,7 @@ const ShiftHistory: React.FC = () => {
                         </div>
                         <div className="activity-meta">
                           <div className="activity-date">
-                            {moment(round.started_at).locale('th').format('DD MMMM YYYY')}
+                            {moment(round.started_at).locale('th').lang('th').format('DD MMMM YYYY')}
                           </div>
                           <div className="activity-time-range">
                             เวลาทำงาน: {moment(round.started_at).format('HH:mm') + " น."} - {round.stopped_at ? moment(round.stopped_at).format('HH:mm') + " น." : 'ปัจจุบัน'}
@@ -145,7 +147,10 @@ const ShiftHistory: React.FC = () => {
                       <div className="stat-box">
                         <span className="stat-box-label">เวลาที่ใช้</span>
                         <span className="stat-box-value">
-                          {round.stopped_at ? moment.duration(moment(round.stopped_at).diff(moment(round.started_at))).asMinutes().toFixed(0) + " นาที" : "ยังไม่สิ้นสุด"}
+                          {round.stopped_at ? (() => {
+                            const min = moment.duration(moment(round.stopped_at).diff(moment(round.started_at))).asMinutes();
+                            return min >= 60 ? (min / 60).toFixed(1) + " ชั่วโมง" : min.toFixed(0) + " นาที";
+                          })() : "ยังไม่สิ้นสุด"}
                         </span>
                       </div>
                     </div>
