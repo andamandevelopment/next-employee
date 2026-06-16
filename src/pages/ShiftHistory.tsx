@@ -9,6 +9,7 @@ import ActivityItemSkeleton from '../components/ActivityItemSkeleton';
 import StatsSkeleton from '../components/StatsSkeleton';
 import './css/Home.css';
 import './css/ShiftHistory.css';
+import { t } from 'i18next';
 // set locale without side-effect import to avoid missing type declarations for the locale module
 moment.locale('th'); 
 
@@ -50,6 +51,10 @@ const ShiftHistory: React.FC = () => {
   useEffect(() => {
     fetchRounds();
   }, []);
+
+  const traslateTime = (time: string) => {
+    return `${moment(time).format("DD ")} ${t(moment().format("MMMM"))} ${moment().format("YYYY")}`;
+  }
 
   return (
     <IonPage>
@@ -119,7 +124,7 @@ const ShiftHistory: React.FC = () => {
                         </div>
                         <div className="activity-meta">
                           <div className="activity-date">
-                            {moment(round.started_at).locale('th').lang('th').format('DD MMMM YYYY')}
+                            {traslateTime(round.started_at)}
                           </div>
                           <div className="activity-time-range">
                             เวลาทำงาน: {moment(round.started_at).format('HH:mm') + " น."} - {round.stopped_at ? moment(round.stopped_at).format('HH:mm') + " น." : 'ปัจจุบัน'}

@@ -1,4 +1,4 @@
-import { IonButton, IonCheckbox, IonContent, IonImg, IonInput, IonItem, IonLabel, IonList, IonPage, IonIcon } from "@ionic/react";
+import { IonButton, IonCheckbox, IonContent, IonImg, IonInput, IonItem, IonLabel, IonList, IonPage, IonIcon, useIonAlert } from "@ionic/react";
 import React, { useState, useEffect } from 'react';
 import { personOutline, lockClosedOutline, eyeOutline, eyeOffOutline } from 'ionicons/icons';
 import "./css/Signin.css";
@@ -11,6 +11,7 @@ const Sigin: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [ionalert,dimissAlert] = useIonAlert();
 
     useEffect(() => {
         const savedUsername = localStorage.getItem('savedUsername');
@@ -68,6 +69,11 @@ const Sigin: React.FC = () => {
             }
         } catch (error) {
             console.error("Login error:", error);
+            ionalert({
+                header: 'เข้าสู่ระบบไม่สำเร็จ',
+                message: 'กรุณาตรวจสอบชื่อผู้ใช้งานและรหัสผ่านของคุณอีกครั้ง',
+                buttons: ['ตกลง']
+            });
             // Show error message to user
         } finally {
             setIsLoading(false);

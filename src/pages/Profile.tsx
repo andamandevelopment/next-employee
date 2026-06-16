@@ -362,6 +362,7 @@ const Profile: React.FC = () => {
                 ออกจากระบบ
               </IonButton>
             </div>
+            <br/><br/>
           </div>
         )}
       </IonContent>

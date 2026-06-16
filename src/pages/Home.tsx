@@ -16,6 +16,7 @@ import CardTripSkeleton from '../components/CardTripSkeleton';
 import ActiveShiftSkeleton from '../components/ActiveShiftSkeleton';
 import StatsSkeleton from '../components/StatsSkeleton'; 
 import moment from 'moment-timezone';
+import { t } from 'i18next';
 
 // Set default timezone to Bangkok (Asia/Bangkok)
 moment.tz.setDefault('Asia/Bangkok');
@@ -95,8 +96,8 @@ const Home: React.FC = () => {
     fetchData(selectedDate);
   }, [selectedDate]);
 
-  const timecounter= moment().locale('th').lang('th').format('LLL')
- 
+  const timecounter= `${moment().format("DD ")} ${t(moment().format("MMMM"))} ${moment().format("YYYY")}`;
+  
   return (
     <IonPage>
       <IonHeader className="ion-no-border header-sticky">

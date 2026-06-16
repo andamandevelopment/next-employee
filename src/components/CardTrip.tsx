@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IonText, IonBadge, IonButton } from "@ionic/react";
 import moment from "moment";
 import "./css/CardTrip.css"
+import { t } from "i18next";
 
 interface CardTripProps {
     title: string;
@@ -16,6 +17,10 @@ interface CardTripProps {
     isEnded?: boolean;
     select(): void;
     busNumber?: string;
+}
+
+const translatetime = (time: string) => {
+    return `${moment(time).format("DD ")} ${t(moment().format("MMMM"))} ${moment().format("YYYY")}`;
 }
 
 const CardTrip: React.FC<CardTripProps> = ({ busNumber, title, time, arrive, disabledSeat, tripdate, passengerOnboard, totalPassenger, isOnBoard, isEnded, select }) => {
@@ -61,7 +66,7 @@ const CardTrip: React.FC<CardTripProps> = ({ busNumber, title, time, arrive, dis
                     <div>
                         {/* <h4 className="font-bold text-slate-800 mb-1">{title}</h4> */}
                         <div className="text-xs text-slate-400">
-                            {tripdate && moment(tripdate).locale("th").format('DD MMMM YYYY')}
+                            {tripdate &&  translatetime(tripdate)}
                         </div>
                     </div>
 

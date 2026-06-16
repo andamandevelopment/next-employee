@@ -11,7 +11,7 @@
   justify-content: center;
   width: 100%;
   height: 100vh;
-  background: #f8fafc;
+  background: var(--ion-color-light-tint);
   position: relative;
   overflow: hidden;
 }
@@ -30,7 +30,7 @@
 .signin-card {
   width: 90%;
   max-width: 400px;
-  background:  #FFF;
+  background:  var(--ion-color-light);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
@@ -72,7 +72,7 @@
 .welcome-text {
   font-size: 1.5rem;
   font-weight: 800;
-  color: #1e293b;
+  color: var(--ion-color-dark-tint);
   margin-bottom: 0.5rem;
   display: block;
 }
@@ -101,7 +101,7 @@
 
 .modern-input-item.item-has-focus {
   border-color: #2563eb;
-  --background: #fff;
+  --background: var(--ion-color-light);;
   box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
 }
 

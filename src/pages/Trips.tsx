@@ -13,6 +13,7 @@ import { Trip } from '../types/trip';
 import { getDriverTrips } from '../http/api';
 import CardTrip from '../components/CardTrip';
 import CardTripSkeleton from '../components/CardTripSkeleton';
+import { t } from 'i18next';
 
 const Trips: React.FC = () => {
   const history = useHistory();
@@ -58,6 +59,7 @@ const Trips: React.FC = () => {
 
   const dates = Array.from({ length: 30 }, (_, i) => moment().startOf("month").add(i, 'days'));
 
+   
   return (
     <IonPage>
       <IonHeader className="ion-no-border">
@@ -89,7 +91,7 @@ const Trips: React.FC = () => {
                   className={`flex flex-col items-center justify-center min-w-[60px] h-[80px] rounded-2xl transition-all duration-200 cursor-pointer ${isSelected ? 'bg-primary text-white shadow-lg scale-105' : 'bg-white text-gray-400'}`}
                 >
                   <span className="text-[10px] font-medium uppercase mb-1">
-                    {date.locale('th').format('ddd')}
+                    {t(date.locale('th').format('ddd'))}
                   </span>
                   <span className={`text-xl font-bold ${isSelected ? 'text-white' : 'text-gray-800'}`}>
                     {date.format('D')}
