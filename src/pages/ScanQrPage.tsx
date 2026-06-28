@@ -109,6 +109,7 @@ const ScanQrPage: React.FC = () => {
 
       const scannedTripId: string = qrDetail?.trip ?? "";
 
+      if(tripId != undefined && tripId !==  null) {
       // ── Case 1: tripId param exists → validate against it ──────────────
         console.log("[ScanQr]  tripId param exists, validating against it:", tripId, "scannedTripId:", scannedTripId);
       if (tripId) {
@@ -120,6 +121,7 @@ const ScanQrPage: React.FC = () => {
         await stop();
         return;
       }
+    }
 
       // ── Case 2: no tripId param → check against today's driver trips ───
       try {
@@ -133,9 +135,9 @@ const ScanQrPage: React.FC = () => {
         console.log("[ScanQr] getDriverTrips:", JSON.stringify(trips));
         const matched = Array.isArray(trips) && trips.find((t: any) =>{
            console.log("t.tripId", t.tripId, " >< scannedTripId", scannedTripId);
-           t.tripId === scannedTripId
+           return t.tripId === scannedTripId;
         });
-
+        console.log("[ScanQr] matched trip:", JSON.stringify(matched));
         if (matched) {
           history.push(`/ticket/${code}`);
           await stop();
